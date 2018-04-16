@@ -13,10 +13,26 @@ public class RequestOperations {
         this.sectionDAO = sectionDAO;
     }
 
+    String currMainSection;
+
+    public void listMainSection(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        List<MainSection> listSection = sectionDAO.listAllSections();
+        request.setAttribute("listMainSection", listSection);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("MainSection.jsp");
+        dispatcher.forward(request, response);
+    }
+
     public void listSection(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
-        List<Section> listSection = sectionDAO.listAllSections();
-        request.setAttribute("listSection", listSection);
+        List<MainSection> listMainSection = sectionDAO.listAllSections();
+        String name = request.getParameter("name");
+
+        currMainSection=name;
+
+        for (MainSection mainSection : listMainSection)
+            if (mainSection.getName().equals(name))
+                request.setAttribute("listSection", mainSection.getSections());
         RequestDispatcher dispatcher = request.getRequestDispatcher("SectionList.jsp");
         dispatcher.forward(request, response);
     }
@@ -47,12 +63,26 @@ public class RequestOperations {
         dispatcher.forward(request, response);
     }
 
+    public void showNewMainForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("NewMainSectionForm.jsp");
+        dispatcher.forward(request, response);
+    }
+
     public void insertSection(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         String name = request.getParameter("name");
         String info = request.getParameter("info");
         Section section = new Section(name.trim(), info.trim());
-        sectionDAO.insertSection(section);
+
+        sectionDAO.insertSection(currMainSection,section);
+        response.sendRedirect("/");
+    }
+
+    public void insertMainSection(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        String name = request.getParameter("name");
+        sectionDAO.insertMainSection(name);
         response.sendRedirect("/");
     }
 
@@ -60,6 +90,14 @@ public class RequestOperations {
             throws SQLException, IOException {
         String name = request.getParameter("name");
         sectionDAO.deleteSection(name);
+        response.sendRedirect("/");
+    }
+
+    public void deleteMainSection(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        String name = request.getParameter("name");
+        //System.out.println(name);
+        sectionDAO.deleteMainSection(name);
         response.sendRedirect("/");
     }
 }

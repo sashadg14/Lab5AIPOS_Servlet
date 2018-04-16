@@ -6,9 +6,7 @@
 <center>
     <h1>Js Reference</h1>
     <h3>
-        <a href="/add">Add new section</a>
-    <br>
-        <a href="/">All Sections</a>
+        <a href="/addMain">Add new section</a>
     </h3>
 </center>
 <div align="center">
@@ -17,14 +15,14 @@
         <tr>
             <th>Section</th>
         </tr>
-        <jsp:useBean id="listSection" scope="request" type="java.util.List"/>
-        <c:forEach var="section" items="${listSection}">
+        <jsp:useBean id="listMainSection" scope="request" type="java.util.List"/>
+        <c:forEach var="section" items="${listMainSection}">
             <tr>
                 <td>
-                    <a href="${pageContext.request.contextPath}/section?name=<c:out value='${section}'/>"><c:out value="${section}" /></a>
-                    <%--<a href="/delete?name=<c:out value='${section.section}'/>">Delete</a>--%>
-                    <form action=/delete method="post">
-                        <input type="hidden" name="name" value="${section}"/>
+                    <a href="/mainSection?name=<c:out value='${section.name}'/>"><c:out value="${section.name}" /></a>
+                        <%--<a href="/delete?name=<c:out value='${section.section}'/>">Delete</a>--%>
+                    <form action=/main_delete method="post">
+                        <input type="hidden" name="name" value="${section.name}"/>
                         <input type="submit" value="Remove">
                     </form>
                 </td>
