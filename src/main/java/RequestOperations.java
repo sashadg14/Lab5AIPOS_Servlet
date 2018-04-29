@@ -1,8 +1,12 @@
+import authoriztion_utils.AuthorizationGitHub;
+import authoriztion_utils.AuthorizationVk;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.Socket;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -28,7 +32,7 @@ public class RequestOperations {
         List<MainSection> listMainSection = sectionDAO.listAllSections();
         String name = request.getParameter("name");
 
-        currMainSection=name;
+        currMainSection = name;
 
         for (MainSection mainSection : listMainSection)
             if (mainSection.getName().equals(name))
@@ -69,13 +73,19 @@ public class RequestOperations {
         dispatcher.forward(request, response);
     }
 
+    public void showAuth(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Auth.jsp");
+        dispatcher.forward(request, response);
+    }
+
     public void insertSection(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         String name = request.getParameter("name");
         String info = request.getParameter("info");
         Section section = new Section(name.trim(), info.trim());
 
-        sectionDAO.insertSection(currMainSection,section);
+        sectionDAO.insertSection(currMainSection, section);
         response.sendRedirect("/");
     }
 
@@ -99,5 +109,35 @@ public class RequestOperations {
         //System.out.println(name);
         sectionDAO.deleteMainSection(name);
         response.sendRedirect("/");
+    }
+
+    public void vkAUTH(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        new AuthorizationVk().execute(response);
+    }
+
+    public void gitAUTH(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        new AuthorizationGitHub().execute(response);
+    }
+
+    public void showHomePage(HttpServletRequest request, HttpServletResponse response)
+            throws  IOException, ServletException {
+        String code = request.getParameter("code");
+        String type = request.getParameter("type");
+        System.out.println(code);
+        //System.out.println(type);
+        String name = "";
+        switch (type) {
+            case "vk":
+                name=new AuthorizationVk().getName(code);
+                break;
+            case "github":
+                name=new AuthorizationGitHub().getName(code);
+        }
+        System.out.println(name);
+        request.getSession().setAttribute("name",name);
+        request.setAttribute("userName", name);
+        request.getRequestDispatcher("Home.jsp").forward(request, response);
     }
 }

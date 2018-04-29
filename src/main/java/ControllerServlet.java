@@ -13,7 +13,6 @@ import java.sql.SQLException;
  * @author www.codejava.net
  */
 public class ControllerServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     private SectionDAO sectionDAO;
     RequestOperations requestOperations;
 
@@ -68,7 +67,19 @@ public class ControllerServlet extends HttpServlet {
                 case "/mainSection":
                     requestOperations.listSection(request, response);
                     break;
-                default:
+                case "/":
+                    requestOperations.showAuth(request, response);
+                    break;
+                case "/authVk":
+                    requestOperations.vkAUTH(request, response);
+                    break;
+                case "/authGit":
+                    requestOperations.gitAUTH(request, response);
+                    break;
+                case "/home":
+                    requestOperations.showHomePage(request, response);
+                    break;
+                case "/all":
                     requestOperations.listMainSection(request, response);
                     break;
             }
