@@ -5,6 +5,7 @@ import com.oracle.webservices.internal.api.message.ContentType;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -27,24 +28,30 @@ public class AuthorizationGitHub {
         response.sendRedirect(url);
     }
 
-    private String getToken(String code) throws IOException {
-        String url = String.format("https://github.com/login/oauth/access_token?"+"client_id=%s&client_secret=%s&" +
-                "grant_type=authorization_code" + "&" +
-                "code=" + code,client_id,client_secret);
+    private String getToken(String code){
+        try {
+            String url = String.format("https://github.com/login/oauth/access_token?" + "client_id=%s&client_secret=%s&" +
+                    "grant_type=authorization_code" + "&" +
+                    "code=" + code, client_id, client_secret);
 
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            URL obj = new URL(url);
+            HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+            con.setRequestMethod("POST");
+            //   con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
 
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response);
+            return response.toString().substring(13, 53);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "";
         }
-        in.close();
-        return response.toString().substring(13,53);
     }
 
     public String getName(String code) throws IOException {
@@ -53,7 +60,7 @@ public class AuthorizationGitHub {
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(),"UTF-8"));
         JSONTokener tokener = new JSONTokener(in);
         JSONObject userInfoResponse = new JSONObject(tokener);
         String login = userInfoResponse.getString("login");

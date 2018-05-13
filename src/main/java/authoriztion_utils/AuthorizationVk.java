@@ -29,14 +29,19 @@ public class AuthorizationVk {
     }
 
     public String getName(String code) throws IOException {
-        String url= String.format("https://api.vk.com/method/users.get?user_ids=%s&fields=bdate&v=5.74",
+        String url= String.format("https://api.vk.com/method/users.get?access_token=%s&v=5.74",
                 getId(code));
+      //  System.out.println(getId(code)+" "+url);
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         InputStreamReader in=new InputStreamReader(con.getInputStream(),"UTF-8");
 
+        //print result
+        //System.out.println(respon.toString());
+
         JSONTokener tokener = new JSONTokener(in);
+        System.out.println(tokener.toString());
         JSONObject userInfoResponse = new JSONObject(tokener).getJSONArray("response").getJSONObject(0);
         String firstName = userInfoResponse.getString("first_name");
         String lastName = userInfoResponse.getString("last_name");
@@ -44,7 +49,7 @@ public class AuthorizationVk {
         return firstName+" "+lastName;
     }
 
-    private int getId(String code) throws IOException {
+    private String getId(String code) throws IOException {
         String url= String.format("https://oauth.vk.com/access_token?client_id=%s&client_secret=%s&redirect_uri=%s&code=%s",
                 client_id, client_secret, redirect_uri, code);
         URL obj = new URL(url);
@@ -53,7 +58,7 @@ public class AuthorizationVk {
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         JSONTokener tokener = new JSONTokener(in);
         JSONObject userResponse = new JSONObject(tokener);
-        int userId = userResponse.getInt("user_id");
+        String userId =userResponse.getString("access_token");
         in.close();
         return userId;
     }

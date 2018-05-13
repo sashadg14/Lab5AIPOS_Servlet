@@ -24,7 +24,7 @@ public class AuthFilter implements Filter {
         } else if (!(path.equals("/")||path.equals("/authVk")||path.equals("/home")||path.equals("/authGit")))
             followError(servletRequest,servletResponse,"401, You are not authorized");
         else filterChain.doFilter(servletRequest, servletResponse);
-        // followError(servletRequest,servletResponse,"Ti pidor");
+        // followError(servletRequest,servletResponse,"Ti pidr");
     }
 
     public void followError(ServletRequest request, ServletResponse response, String message) throws ServletException, IOException {
